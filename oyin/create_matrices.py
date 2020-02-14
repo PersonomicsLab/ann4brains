@@ -36,13 +36,49 @@ siteB = [patient.split('\t') for patient in siteB]
 #%% creating matrix
 siteB_pt1 = siteB[0]
 num_regions = 10
+num_patients = 115
 matrix = np.ones((num_regions, num_regions))
 
+sum = 0
+for num in range(num_regions):
+    sum = sum + num
+
 counter = 0
-while 
-for num in range(matrix.shape[0]):
-    for num in range(matrix.shape[1]):
+for row in range(num_regions):
+    for col in range(num_regions):
+        if counter >= sum-1:
+            counter = 0
+        if row != col:
+            matrix[row][col] = siteB_pt1[counter]
+            counter = counter + 1
 
-    
-
+print(counter)
 print(sum)
+# %%
+# print(matrix)
+print(matrix[0][num_regions-1] == matrix[num_regions-1][0])
+print(matrix[0])
+print(matrix[9])
+
+
+# %% creating matrix attempt part letter 2
+# upper triangular part
+test_dim = 5
+counter = 0
+for row in range(test_dim):
+    for col in range(row+1, test_dim):
+        matrix[row][col] = siteB_pt1[counter]
+        counter = counter + 1
+        # print("row:", row)
+        # print("col", col)
+
+print("sep")
+# lower triangular matrix
+counter = 0
+for col in range(test_dim):
+    for row in range(col+1, test_dim):
+        # matrix[row][]
+        matrix[row][col] = siteB_pt1[counter]
+        counter = counter + 1
+        # print("col", col) 
+        # print("row:", row)
