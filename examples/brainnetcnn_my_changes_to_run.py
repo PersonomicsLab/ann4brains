@@ -1,7 +1,6 @@
 # To add a new cell, type '# %%'
 # To add a new markdown cell, type '# %% [markdown]'
 # %%
-from __future__ import print_function
 from IPython import get_ipython
 
 # %% [markdown]
@@ -15,16 +14,17 @@ from IPython import get_ipython
 # <p>These results should closely match those in Table 2 (if you use the longer 'max_iter' as shown in the comments below)</p>
 
 # %%
+from __future__ import print_function
 import os
 import sys
 import numpy as np
-# get_ipython().run_line_magic('matplotlib', 'inline')
+get_ipython().run_line_magic('matplotlib', 'inline')
 import matplotlib.pyplot as plt
 
 
 # %%
-# get_ipython().run_line_magic('reload_ext', 'autoreload')
-# get_ipython().run_line_magic('autoreload', '2')
+get_ipython().run_line_magic('reload_ext', 'autoreload')
+get_ipython().run_line_magic('autoreload', '2')
 # If you don't have pycaffe in path.
 # sys.path.insert(0, os.path.join('/home/jer/projects/caffe/', 'python')) 
 import caffe
@@ -75,6 +75,100 @@ x_valid, y_valid = injury.generate_injury(n_samples=56, noise_weight=0.125)
 # %%
 print(x_train.shape) # 112 samples of size 90 x 90 (1 since there's only 1 channel)
 print(y_train.shape) # How much each of the 2 signatures weight the 112 samples.
+
+
+# %%
+# importing helper file
+# helper_dir = r'C:\Users\oyina\src\senior_2019-2020\lab\bijsterbosch\project\oyin'
+
+# sys.path.append(helper_dir)
+import helpers as help
+import importlib
+
+
+#%% updating help
+help = importlib.reload(help)
+
+#%% read in data from the two sites
+siteB_file = "FNETs_siteB.txt"
+siteH_file = "FNETs_siteH.txt" 
+num_regions = 10
+
+site_B_data = help.read_data(siteB_file)
+site_H_data = help.read_data(siteH_file)
+
+#%% create x data
+
+# initialize array in which to hold site data; i is for channel dimension
+site_B_connectomes = np.ones((len(site_B_data), 1, num_regions, num_regions))
+site_H_connectomes = np.ones((len(site_H_data), 1, num_regions, num_regions))
+
+# create data matrices
+for person in range(len(site_B_data)):
+    site_B_connectomes[person, :, :, :] = help.list_to_connectome(site_B_data[person], num_regions)
+for person in range(len(site_H_data)):
+    site_H_connectomes[person, :, :, :] = help.list_to_connectome(site_B_data[person], num_regions)
+
+#%% create y data
+# site b is first col, site h is second
+both_site_length = len(site_B_data) + len(site_H_data)
+y = np.zeros((both_site_length, 2))
+y[0:len(site_B_data),0] = 1 # site b is first column
+y[len(site_B_data)+1:len(y),1] = 1 # site h is second column
+# site_B_class = np.ones((len(site_B_data),1)) 
+# site_H_class = np.ones((len(site_H_data),1))
+
+# concatenate
+x = np.concatenate((site_B_connectomes, site_H_connectomes), axis=0)
+print(x.shape)
+print(y.shape)
+
+
+#%% randomly assign to train, val, and test
+
+# create empty lists ot hold data
+trian_x = []
+train_y = []
+val_x = []
+val_y = []
+test_x = []
+test_y = []
+
+# seed random number generator
+seed_num = 0
+np.random.seed(seed_num)
+
+# create train, val, and test thresholds
+train_thresh = 0.7
+val_thresh = 0.2
+test_thresh = 0.1
+
+for idx, example in enumerate(x):
+    
+    # generate random number
+    split_prob = np.random.random()
+    print(split_prob)
+
+    # train
+    if split_prob >= 0 and split_prob < train_thresh:
+        train_x = x[idx]
+        train_y = y[idx]
+    # val
+    elif split_prob >= train_thresh and split_prob < train_thresh + val_thresh:
+        val_x = x[idx]
+        val_y = y[idx]
+    # test
+    else:
+        test_x = x[idx]
+        test_y = y[idx]
+
+#%% rename data to fit into model
+x_train = np.array(train_x)
+y_train = np.array(train_y)
+x_val = np.array(val_x)
+y_val = np.array(val_y)
+x_test = np.array(test_x)
+y_test = np.array(test_y)
 
 
 # %%
