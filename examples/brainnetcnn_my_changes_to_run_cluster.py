@@ -221,7 +221,7 @@ e2n_arch = [
 # Create BrainNetCNN model
 E2Nnet_sml = BrainNetCNN(net_name, # Unique model name.
                          e2n_arch, # List of dictionaries specifying the architecture.
-                         hardware='gpu', # Or 'cpu'.
+                         hardware='cpu', # Or 'cpu'.
                          dir_data='./generated_synthetic_data', # Where to write the data to.
                         )
 
@@ -235,7 +235,7 @@ E2Nnet_sml = BrainNetCNN(net_name, # Unique model name.
 
 # NOTE using the above parameters takes awhile for the model to train (~5 minutes on a GPU)
 # If you want to do some simple fast experiments to start, use these settings instead.
-E2Nnet_sml.pars['max_iter'] = 1000 # Train the model for 1000 iterations. (note this should be run for much longer!)
+E2Nnet_sml.pars['max_iter'] = 10 # Train the model for 1000 iterations. (note this should be run for much longer!)
 E2Nnet_sml.pars['test_interval'] = 50 # Check the valid data every 50 iterations.
 E2Nnet_sml.pars['snapshot'] = 1000 # Save the model weights every 1000 iterations.
 
@@ -252,116 +252,130 @@ E2Nnet_sml.fit(x_train, y_train, x_valid, y_valid)  # If no valid data, could pu
 E2Nnet_sml.plot_iter_metrics() 
 
 
-# %%
-# Predict labels of test data
-preds = E2Nnet_sml.predict(x_test)
 
 
-# %%
-# Compute the metrics.
-E2Nnet_sml.print_results(preds, y_test)
 
 
-# %%
-# We can save the model like this.
-E2Nnet_sml.save('models/E2Nnet_sml.pkl')
 
 
-# %%
-# Now let's try removing and loading the saved model.
-del E2Nnet_sml
-del preds
 
 
-# %%
-# Load the model like this.
-E2Nnet_sml = load_model('models/E2Nnet_sml.pkl')
 
 
-# %%
-# Make sure predicts the same results using the saved/loaded model.
-preds = E2Nnet_sml.predict(x_test)
-# Compute the metrics.
-E2Nnet_sml.print_results(preds, y_test)
+
+# #%% STOP HERE FOR NOW!!!
 
 
-# %%
-# By default, the model parameters at the last iteration are used. 
-# But we can specify an earlier iteration number and use those weights instead
-# (as long as is a multiple of E2Nnet_sml.pars['snapshot'])
-E2Nnet_sml.load_parameters(1000)
+# # %%
+# # Predict labels of test data
+# preds = E2Nnet_sml.predict(x_test)
 
 
-# %%
-preds = E2Nnet_sml.predict(x_test)
-# Compute the metrics (should be slightly worse since we are using earlier iterations)
-E2Nnet_sml.print_results(preds, y_test)
-
-# %% [markdown]
-# <h1>Edge-to-Edge test</h1>
-# <p>Example of using the Edge-to-Edge (E2E) layer along with an E2N layer.</p>
-
-# %%
-# Unique name for the model
-net_name = 'E2Enet_sml'
-
-# Specify the architecture.
-e2e_arch = [
-    ['e2e', # e2e layer 
-     {'n_filters': 32, # 32 feature maps 
-      'kernel_h': h, 'kernel_w': w  # Sliding cross filter of size h x 1 by 1 x w
-     }
-    ], 
-    ['e2n', {'n_filters': 64, 'kernel_h': h, 'kernel_w': w}],
-    ['dropout', {'dropout_ratio': 0.5}],
-    ['relu',    {'negative_slope': 0.33}],
-    ['fc',      {'n_filters': 30}],
-    ['relu',    {'negative_slope': 0.33}],
-    ['out',     {'n_filters': n_injuries}] 
-]
-
-# Create BrainNetCNN model
-E2Enet_sml = BrainNetCNN(net_name, e2e_arch, 
-                         hardware='gpu', # Or 'cpu'.
-                         dir_data='./generated_synthetic_data', # Where to write the data to.
-                        )
+# # %%
+# # Compute the metrics.
+# E2Nnet_sml.print_results(preds, y_test)
 
 
-# %%
-# Overwrite default parameters.
-# ann4brains.nets.get_default_hyper_params() shows the hyper-parameters that can be overwritten.
-#E2Enet_sml.pars['max_iter'] = 100000 # Train the model for 100K iterations.
-#E2Enet_sml.pars['test_interval'] = 500 # Check the valid data every 500 iterations.
-#E2Enet_sml.pars['snapshot'] = 10000 # Save the model weights every 10000 iterations.
-
-# NOTE using the above parameters takes awhile for the model to train (~2 hours ish? on a GPU)
-# If you want to do some simple fast experiments to start, use these settings instead.
-E2Enet_sml.pars['max_iter'] = 100 # Train the model for 100 iterations (note this should be run for much longer!)
-E2Enet_sml.pars['test_interval'] = 20 # Check the valid data every 20 iterations.
-E2Enet_sml.pars['snapshot'] = 100 # Save the model weights every 100 iterations.
+# # %%
+# # We can save the model like this.
+# E2Nnet_sml.save('models/E2Nnet_sml.pkl')
 
 
-# %%
-# Train (optimize) the network.
-# WARNING: this could take awhile... (like 2 hours with a GPU). Perhaps lower the max_iter
-E2Enet_sml.fit(x_train, y_train, x_valid, y_valid)  # If no valid data, could put test data here.
+# # %%
+# # Now let's try removing and loading the saved model.
+# del E2Nnet_sml
+# del preds
 
 
-# %%
-# Visualize the training loss, and valid metrics over training iterations.
-E2Enet_sml.plot_iter_metrics() 
+# # %%
+# # Load the model like this.
+# E2Nnet_sml = load_model('models/E2Nnet_sml.pkl')
 
 
-# %%
-# Predict labels of test data
-preds = E2Enet_sml.predict(x_test)
+# # %%
+# # Make sure predicts the same results using the saved/loaded model.
+# preds = E2Nnet_sml.predict(x_test)
+# # Compute the metrics.
+# E2Nnet_sml.print_results(preds, y_test)
 
 
-# %%
-# Compute the metrics.
-E2Enet_sml.print_results(preds, y_test)
+# # %%
+# # By default, the model parameters at the last iteration are used. 
+# # But we can specify an earlier iteration number and use those weights instead
+# # (as long as is a multiple of E2Nnet_sml.pars['snapshot'])
+# E2Nnet_sml.load_parameters(1000)
 
 
-# %%
+# # %%
+# preds = E2Nnet_sml.predict(x_test)
+# # Compute the metrics (should be slightly worse since we are using earlier iterations)
+# E2Nnet_sml.print_results(preds, y_test)
+
+# # %% [markdown]
+# # <h1>Edge-to-Edge test</h1>
+# # <p>Example of using the Edge-to-Edge (E2E) layer along with an E2N layer.</p>
+
+# # %%
+# # Unique name for the model
+# net_name = 'E2Enet_sml'
+
+# # Specify the architecture.
+# e2e_arch = [
+#     ['e2e', # e2e layer 
+#      {'n_filters': 32, # 32 feature maps 
+#       'kernel_h': h, 'kernel_w': w  # Sliding cross filter of size h x 1 by 1 x w
+#      }
+#     ], 
+#     ['e2n', {'n_filters': 64, 'kernel_h': h, 'kernel_w': w}],
+#     ['dropout', {'dropout_ratio': 0.5}],
+#     ['relu',    {'negative_slope': 0.33}],
+#     ['fc',      {'n_filters': 30}],
+#     ['relu',    {'negative_slope': 0.33}],
+#     ['out',     {'n_filters': n_injuries}] 
+# ]
+
+# # Create BrainNetCNN model
+# E2Enet_sml = BrainNetCNN(net_name, e2e_arch, 
+#                          hardware='cpu', # Or 'cpu'.
+#                          dir_data='./generated_synthetic_data', # Where to write the data to.
+#                         )
+
+
+# # %%
+# # Overwrite default parameters.
+# # ann4brains.nets.get_default_hyper_params() shows the hyper-parameters that can be overwritten.
+# #E2Enet_sml.pars['max_iter'] = 100000 # Train the model for 100K iterations.
+# #E2Enet_sml.pars['test_interval'] = 500 # Check the valid data every 500 iterations.
+# #E2Enet_sml.pars['snapshot'] = 10000 # Save the model weights every 10000 iterations.
+
+# # NOTE using the above parameters takes awhile for the model to train (~2 hours ish? on a GPU)
+# # If you want to do some simple fast experiments to start, use these settings instead.
+# E2Enet_sml.pars['max_iter'] = 100 # Train the model for 100 iterations (note this should be run for much longer!)
+# E2Enet_sml.pars['test_interval'] = 20 # Check the valid data every 20 iterations.
+# E2Enet_sml.pars['snapshot'] = 100 # Save the model weights every 100 iterations.
+
+
+# # %%
+# # Train (optimize) the network.
+# # WARNING: this could take awhile... (like 2 hours with a GPU). Perhaps lower the max_iter
+# E2Enet_sml.fit(x_train, y_train, x_valid, y_valid)  # If no valid data, could put test data here.
+
+
+# # %%
+# # Visualize the training loss, and valid metrics over training iterations.
+# E2Enet_sml.plot_iter_metrics() 
+
+
+# # %%
+# # Predict labels of test data
+# preds = E2Enet_sml.predict(x_test)
+
+
+# # %%
+# # Compute the metrics.
+# E2Enet_sml.print_results(preds, y_test)
+
+
+# # %%
 
 
