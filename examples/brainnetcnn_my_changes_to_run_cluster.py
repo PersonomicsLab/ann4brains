@@ -175,11 +175,11 @@ y_test = np.array(test_y)
 # Show example noisy training data that have the signatures applied.
 # It's not obvious to the human eye the subtle differences, but the cross row and column above 
 # perturbed the below matrices with the y weights.
-plt.figure(figsize=(16,4))
-for idx in range(3):
-    plt.subplot(1,3,idx+1); plt.imshow(np.squeeze(x_train[idx]), interpolation="None"); 
-    plt.colorbar();
-    plt.title(y_train[idx]) # How much each signature is weighted by.
+# plt.figure(figsize=(16,4))
+# for idx in range(3):
+#     plt.subplot(1,3,idx+1); plt.imshow(np.squeeze(x_train[idx]), interpolation="None"); 
+#     plt.colorbar();
+#     plt.title(y_train[idx]) # How much each signature is weighted by.
 
 
 # %%
