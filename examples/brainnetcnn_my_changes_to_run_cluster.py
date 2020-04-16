@@ -82,7 +82,7 @@ print(y_train.shape) # How much each of the 2 signatures weight the 112 samples.
 # helper_dir = r'C:\Users\oyina\src\senior_2019-2020\lab\bijsterbosch\project\oyin'
 
 # sys.path.append(helper_dir)
-import helpers as help
+import helpers_cluster as help
 import importlib
 
 
