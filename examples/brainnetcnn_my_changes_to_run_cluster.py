@@ -127,7 +127,7 @@ print(y.shape)
 #%% randomly assign to train, val, and test
 
 # create empty lists ot hold data
-trian_x = []
+train_x = []
 train_y = []
 val_x = []
 val_y = []
@@ -147,20 +147,20 @@ for idx, example in enumerate(x):
     
     # generate random number
     split_prob = np.random.random()
-    print(split_prob)
+    # print(split_prob)
 
     # train
     if split_prob >= 0 and split_prob < train_thresh:
-        train_x = x[idx]
-        train_y = y[idx]
+        train_x.append(x[idx])
+        train_y.append(y[idx])
     # val
     elif split_prob >= train_thresh and split_prob < train_thresh + val_thresh:
-        val_x = x[idx]
-        val_y = y[idx]
+        val_x.append(x[idx])
+        val_y.append(y[idx])
     # test
     else:
-        test_x = x[idx]
-        test_y = y[idx]
+        test_x.append(x[idx])
+        test_y.append(y[idx])
 
 #%% rename data to fit into model
 x_train = np.array(train_x)
@@ -170,16 +170,24 @@ y_val = np.array(val_y)
 x_test = np.array(test_x)
 y_test = np.array(test_y)
 
+#%% print shapes of data
+print(x_train.shape)
+print(y_train.shape)
+print(x_val.shape)
+print(y_val.shape)
+print(x_test.shape)
+print(y_test.shape)
+
 
 # %%
 # Show example noisy training data that have the signatures applied.
 # It's not obvious to the human eye the subtle differences, but the cross row and column above 
 # perturbed the below matrices with the y weights.
-# plt.figure(figsize=(16,4))
-# for idx in range(3):
-#     plt.subplot(1,3,idx+1); plt.imshow(np.squeeze(x_train[idx]), interpolation="None"); 
-#     plt.colorbar();
-#     plt.title(y_train[idx]) # How much each signature is weighted by.
+plt.figure(figsize=(16,4))
+for idx in range(3):
+    plt.subplot(1,3,idx+1); plt.imshow(np.squeeze(x_train[idx]), interpolation="None"); 
+    plt.colorbar();
+    plt.title(y_train[idx]) # How much each signature is weighted by.
 
 
 # %%
