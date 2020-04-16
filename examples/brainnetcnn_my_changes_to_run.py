@@ -1,6 +1,7 @@
 # To add a new cell, type '# %%'
 # To add a new markdown cell, type '# %% [markdown]'
 # %%
+from __future__ import print_function
 from IPython import get_ipython
 
 # %% [markdown]
@@ -14,17 +15,16 @@ from IPython import get_ipython
 # <p>These results should closely match those in Table 2 (if you use the longer 'max_iter' as shown in the comments below)</p>
 
 # %%
-from __future__ import print_function
 import os
 import sys
 import numpy as np
-get_ipython().run_line_magic('matplotlib', 'inline')
+# get_ipython().run_line_magic('matplotlib', 'inline')
 import matplotlib.pyplot as plt
 
 
 # %%
-get_ipython().run_line_magic('reload_ext', 'autoreload')
-get_ipython().run_line_magic('autoreload', '2')
+# get_ipython().run_line_magic('reload_ext', 'autoreload')
+# get_ipython().run_line_magic('autoreload', '2')
 # If you don't have pycaffe in path.
 # sys.path.insert(0, os.path.join('/home/jer/projects/caffe/', 'python')) 
 import caffe
