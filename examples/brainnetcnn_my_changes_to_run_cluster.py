@@ -163,12 +163,12 @@ for idx, example in enumerate(x):
         test_y.append(y[idx])
 
 #%% rename data to fit into model
-x_train = np.array(train_x)
-y_train = np.array(train_y)
-x_val = np.array(val_x)
-y_val = np.array(val_y)
-x_test = np.array(test_x)
-y_test = np.array(test_y)
+x_train = np.array(train_x, dtype=np.float32)
+y_train = np.array(train_y, dtype=np.float32)
+x_val = np.array(val_x, dtype=np.float32)
+y_val = np.array(val_y, dtype=np.float32)
+x_test = np.array(test_x, dtype=np.float32)
+y_test = np.array(test_y, dtype=np.float32)
 
 #%% print shapes of data
 print(x_train.shape)
