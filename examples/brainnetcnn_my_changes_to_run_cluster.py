@@ -246,10 +246,6 @@ E2Nnet_sml.pars['snapshot'] = 1000 # Save the model weights every 1000 iteration
 E2Nnet_sml.fit(x_train, y_train, x_valid, y_valid)  # If no valid data, could put test data here.
 
 
-# %%
-# Plot the training iterations vs. the training loss, the valid data mean-absolute-difference, 
-# and the valid data correlation with predicted and true (y_vald) labels.
-E2Nnet_sml.plot_iter_metrics() 
 
 
 
@@ -260,11 +256,12 @@ E2Nnet_sml.plot_iter_metrics()
 
 
 
+#%% STOP HERE FOR NOW
 
-
-
-# #%% STOP HERE FOR NOW!!!
-
+# # %%
+# # Plot the training iterations vs. the training loss, the valid data mean-absolute-difference, 
+# # and the valid data correlation with predicted and true (y_vald) labels.
+# E2Nnet_sml.plot_iter_metrics() 
 
 # # %%
 # # Predict labels of test data
