@@ -8,6 +8,7 @@
 import os
 import sys
 import numpy as np
+import pickle
 import caffe
 
 # To import ann4brains if not installed.
@@ -193,4 +194,8 @@ E2Nnet_sml.print_results(preds, y_test)
 
 # %%
 # We can save the model like this.
+test_data = (x_test, y_test)
+file_name = "model/test_data.pkl"
+with open(file_name, 'wb') as pkl_file:
+        pickle.dump(test_data, pkl_file, protocol = 2)
 E2Nnet_sml.save('models/E2Nnet_sml.pkl')
