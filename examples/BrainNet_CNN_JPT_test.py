@@ -176,3 +176,21 @@ E2Nnet_sml.fit(x_train, y_train, x_val, y_val)  # If no valid data, could put te
 
 print("mission completed!")
 
+# %%
+# Plot the training iterations vs. the training loss, the valid data mean-absolute-difference, 
+# and the valid data correlation with predicted and true (y_vald) labels.
+E2Nnet_sml.plot_iter_metrics() 
+
+# %%
+# Predict labels of test data
+preds = E2Nnet_sml.predict(x_test)
+
+
+# %%
+# Compute the metrics.
+E2Nnet_sml.print_results(preds, y_test)
+
+
+# %%
+# We can save the model like this.
+E2Nnet_sml.save('models/E2Nnet_sml.pkl')

@@ -186,7 +186,7 @@ print(y_test.shape)
 plt.figure(figsize=(16,4))
 for idx in range(3):
     plt.subplot(1,3,idx+1); plt.imshow(np.squeeze(x_train[idx]), interpolation="None"); 
-    plt.colorbar();
+    plt.colorbar()
     plt.title(y_train[idx]) # How much each signature is weighted by.
 
 
@@ -243,6 +243,7 @@ E2Nnet_sml.pars['snapshot'] = 1000 # Save the model weights every 1000 iteration
 # %%
 # Train (optimize) the network.
 # WARNING: If you have a high max_iter and no GPU, this could take awhile...
+os.environ["HDF5_USE_FILE_LOCKING"] = 'FALSE'
 E2Nnet_sml.fit(x_train, y_train, x_valid, y_valid)  # If no valid data, could put test data here.
 
 
