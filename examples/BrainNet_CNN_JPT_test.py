@@ -118,6 +118,12 @@ print(y_val.shape)
 print(x_test.shape)
 print(y_test.shape)
 
+print("y_train", y_train)
+print("y_val", y_val)
+print("y_test", y_test)
+
+
+
 
 # In[30]:
 
