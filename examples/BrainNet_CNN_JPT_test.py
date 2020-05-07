@@ -190,6 +190,9 @@ preds = E2Nnet_sml.predict(x_test)
 # %%
 # Compute the metrics.
 E2Nnet_sml.print_results(preds, y_test)
+print("preds", preds)
+print("y_test", y_test)
+print("subracted", preds-y_test)
 
 
 # %%
