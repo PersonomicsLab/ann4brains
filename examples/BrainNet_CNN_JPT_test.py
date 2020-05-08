@@ -165,7 +165,7 @@ E2Nnet_sml = BrainNetCNN(net_name, # Unique model name.
                          dir_data='./generated_synthetic_data', # Where to write the data to.
                         )
 #set pars
-E2Nnet_sml.pars['max_iter'] = 1000 # Train the model for 1000 iterations. (note this should be run for much longer!)
+E2Nnet_sml.pars['max_iter'] = 10000 # Train the model for 1000 iterations. (note this should be run for much longer!)
 E2Nnet_sml.pars['test_interval'] = 50 # Check the valid data every 50 iterations.
 E2Nnet_sml.pars['snapshot'] = 10 # Save the model weights every 1000 iterations.
 
@@ -196,9 +196,11 @@ preds = E2Nnet_sml.predict(x_test)
 # %%
 # Compute the metrics.
 E2Nnet_sml.print_results(preds, y_test)
-print("preds", preds)
+print("predictions raw", preds)
 print("y_test", y_test)
-print("subracted", preds-y_test)
+preds_trans = preds[preds >=0.5] = 1
+preds_trans = preds[preds < 0.5] = 0
+print("predictions", preds_trans)
 
 
 # %%
