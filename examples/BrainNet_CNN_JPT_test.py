@@ -198,8 +198,9 @@ preds = E2Nnet_sml.predict(x_test)
 E2Nnet_sml.print_results(preds, y_test)
 print("predictions raw", preds)
 print("y_test", y_test)
-preds_trans = preds[preds >=0.5] = 1
-preds_trans = preds[preds < 0.5] = 0
+preds_trans = np.zeros((preds.shape))
+preds_trans[preds >=0.5] = 1
+preds_trans[preds < 0.5] = 0
 print("predictions", preds_trans)
 
 
