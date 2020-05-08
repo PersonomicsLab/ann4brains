@@ -118,9 +118,9 @@ print(y_val.shape)
 print(x_test.shape)
 print(y_test.shape)
 
-print("y_train", y_train)
-print("y_val", y_val)
-print("y_test", y_test)
+# print("y_train", y_train)
+# print("y_val", y_val)
+# print("y_test", y_test)
 
 
 
@@ -165,7 +165,7 @@ E2Nnet_sml = BrainNetCNN(net_name, # Unique model name.
                          dir_data='./generated_synthetic_data', # Where to write the data to.
                         )
 #set pars
-E2Nnet_sml.pars['max_iter'] = 20 # Train the model for 1000 iterations. (note this should be run for much longer!)
+E2Nnet_sml.pars['max_iter'] = 1000 # Train the model for 1000 iterations. (note this should be run for much longer!)
 E2Nnet_sml.pars['test_interval'] = 50 # Check the valid data every 50 iterations.
 E2Nnet_sml.pars['snapshot'] = 10 # Save the model weights every 1000 iterations.
 
@@ -208,3 +208,5 @@ file_name = "models/test_data.pkl"
 with open(file_name, 'wb') as pkl_file:
         pickle.dump(test_data, pkl_file, protocol = 2)
 E2Nnet_sml.save('models/E2Nnet_sml.pkl')
+
+
