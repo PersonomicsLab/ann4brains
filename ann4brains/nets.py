@@ -252,7 +252,7 @@ class BaseNet(object):
         pass
 
     # @abc.abstractmethod
-    def plot_iter_metrics(self, save = False, file_name = "")):
+    def plot_iter_metrics(self, save = False, file_name = ""):
         """Plot the train, test metrics over iterations."""
         # Implement in the inherited class.
         pass
@@ -413,6 +413,6 @@ class BrainNetCNN(BaseNet):
         axes[1].legend(lines + lines2, labels + labels2, loc='best')
 
         if save:
-            parent = os.path.dirname(os.getcwd())
-            file_name = os.path.join(parent, file_name)
+            # parent = os.path.dirname(os.getcwd())
+            # file_name = os.path.join(parent, file_name)
             plt.savefig(file_name)

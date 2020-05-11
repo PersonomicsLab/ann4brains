@@ -184,7 +184,7 @@ print("mission completed!")
 # %%
 # Plot the training iterations vs. the training loss, the valid data mean-absolute-difference, 
 # and the valid data correlation with predicted and true (y_vald) labels.
-file_name = "/examples/models/iter_metrics.png"
+file_name = os.path.join(os.path.dirname(os.getcwd()), "/models/plot_metrics.png")
 E2Nnet_sml.plot_iter_metrics(True, file_name)
 
 # %%
