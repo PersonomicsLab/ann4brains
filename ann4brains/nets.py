@@ -379,7 +379,7 @@ class BrainNetCNN(BaseNet):
                                                                          test_metrics_1['corr_0'],
                                                                          test_metrics_1['p_0']))
 
-    def plot_iter_metrics(self):
+    def plot_iter_metrics(self, save = False, file_name = ""):
         """Plot the train, test metrics over iterations.
 
         This assumes two classes. And that utils.metrics.regression_metrics was used to monitor the performance.
@@ -411,3 +411,8 @@ class BrainNetCNN(BaseNet):
         lines, labels = axes[0].get_legend_handles_labels()
         lines2, labels2 = axes[1].get_legend_handles_labels()
         axes[1].legend(lines + lines2, labels + labels2, loc='best')
+
+        if save:
+            dir = "../ann4brains/examples/models"
+            file_name = os.path.join(dir, file_name)
+            plt.savefig(file_name)

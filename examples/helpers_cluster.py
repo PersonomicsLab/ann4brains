@@ -1,6 +1,8 @@
 #%% importing things
 import numpy as np
 import os
+from ann4brains.nets import BrainNetCNN, load_model
+
 working_dir = '/scratch/oadenekan/project_norm/ann4brains/examples'
 # working_dir = r'C:\Users\oyina\src\senior_2019-2020\lab\bijsterbosch\project\oyin'
 os.chdir(working_dir)
@@ -45,3 +47,96 @@ def list_to_connectome(person_data, num_regions):
             # print("col", col) 
             # print("row:", row)
     return np.array(matrix)
+
+#%% connectomes to data
+
+def connectomes_to_data(site_B_data, site_H_data, num_regions):
+    # initialize array in which to hold site data; i is for channel dimension
+    site_B_connectomes = np.ones((len(site_B_data), 1, num_regions, num_regions))
+    site_H_connectomes = np.ones((len(site_H_data), 1, num_regions, num_regions))
+
+    # create data matrices: each person call function
+    for person in range(len(site_B_data)):
+        site_B_connectomes[person, :, :, :] = list_to_connectome(site_B_data[person], num_regions)
+    for person in range(len(site_H_data)):
+        site_H_connectomes[person, :, :, :] = list_to_connectome(site_B_data[person], num_regions)
+
+        
+    # create y data
+    # site b is first col, site h is second
+    both_site_length = len(site_B_data) + len(site_H_data)
+    y = np.zeros((both_site_length, 2))
+    y[0:len(site_B_data), 0] = 1 # site b is first column
+    y[len(site_B_data)+1:len(y), 1] = 1 # site h is second column
+
+    # concatenate x data
+    x = np.concatenate((site_B_connectomes, site_H_connectomes), axis=0)
+    print(x.shape)
+    print(y.shape)
+    return (x,y)
+
+#%% create e2n net
+def e2n(net_name, h, w, n_injuries):
+    # Specify the architecture using a list of dictionaries.
+    e2n_arch = [
+        ['e2n', # e2n layer 
+        {'n_filters': 130, # 130 feature maps 
+        'kernel_h': h, 'kernel_w': w  # Cross filter of size h x 1 by 1 x w (non-sliding, only on diagonal)
+        }
+        ], 
+        ['dropout', {'dropout_ratio': 0.5}], # Dropout with 0.5 dropout rate.
+        ['relu',    {'negative_slope': 0.33}], # Very leaky ReLU.
+        ['fc',      {'n_filters': 30}],  # Fully connected/dense (Node-to-Graph when after e2n) layer
+        ['relu',    {'negative_slope': 0.33}], # Very leaky ReLU
+        ['out',     {'n_filters': n_injuries}] # Output with 2 nodes that correspond to 2 injuries.
+    ]
+
+    # Create BrainNetCNN model
+    E2Nnet_sml = BrainNetCNN(net_name, # Unique model name.
+                            e2n_arch, # List of dictionaries specifying the architecture.
+                            hardware='cpu', # Or 'cpu'.
+                            dir_data='./generated_synthetic_data', # Where to write the data to.
+                            )
+    #set pars
+    E2Nnet_sml.pars['max_iter'] = 100000 # Train the model for 1000 iterations. (note this should be run for much longer!)
+    E2Nnet_sml.pars['test_interval'] = 50 # Check the valid data every 50 iterations.
+    E2Nnet_sml.pars['snapshot'] = 10 # Save the model weights every 1000 iterations.
+
+    return E2Nnet_sml
+
+#%% create e2e + e2n net
+def e2e(net_name, h, w, n_injuries):
+    # Specify the architecture.
+    e2e_arch = [
+        ['e2e', # e2e layer 
+         {'n_filters': 32, # 32 feature maps 
+          'kernel_h': h, 'kernel_w': w  # Sliding cross filter of size h x 1 by 1 x w
+         }
+        ], 
+        ['e2n', {'n_filters': 64, 'kernel_h': h, 'kernel_w': w}],
+        ['dropout', {'dropout_ratio': 0.5}],
+        ['relu',    {'negative_slope': 0.33}],
+        ['fc',      {'n_filters': 30}],
+        ['relu',    {'negative_slope': 0.33}],
+        ['out',     {'n_filters': n_injuries}] 
+    ]
+
+    # Create BrainNetCNN model
+    E2Enet_sml = BrainNetCNN(net_name, e2e_arch, 
+                             hardware='cpu', # Or 'cpu'.
+                             dir_data='./generated_synthetic_data', # Where to write the data to.
+                            )
+
+    # Overwrite default parameters.
+    # ann4brains.nets.get_default_hyper_params() shows the hyper-parameters that can be overwritten.
+    #E2Enet_sml.pars['max_iter'] = 100000 # Train the model for 100K iterations.
+    #E2Enet_sml.pars['test_interval'] = 500 # Check the valid data every 500 iterations.
+    #E2Enet_sml.pars['snapshot'] = 10000 # Save the model weights every 10000 iterations.
+
+    # NOTE using the above parameters takes awhile for the model to train (~2 hours ish? on a GPU)
+    # If you want to do some simple fast experiments to start, use these settings instead.
+    E2Enet_sml.pars['max_iter'] = 100 # Train the model for 100 iterations (note this should be run for much longer!)
+    E2Enet_sml.pars['test_interval'] = 20 # Check the valid data every 20 iterations.
+    E2Enet_sml.pars['snapshot'] = 100 # Save the model weights every 100 iterations.
+
+    return E2Enet_sml

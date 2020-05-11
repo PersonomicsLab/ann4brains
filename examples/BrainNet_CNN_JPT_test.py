@@ -12,7 +12,7 @@ import pickle
 import caffe
 
 # To import ann4brains if not installed.
-sys.path.insert(0, os.path.abspath(os.path.join(os.getcwd(), '..'))) 
+sys.path.insert(0, os.path.abspath(os.path.join(os.getcwd(), '..')))
 from ann4brains.synthetic.injury import ConnectomeInjury
 from ann4brains.nets import BrainNetCNN, load_model
 
@@ -51,10 +51,8 @@ for person in range(len(site_H_data)):
 # site b is first col, site h is second
 both_site_length = len(site_B_data) + len(site_H_data)
 y = np.zeros((both_site_length, 2))
-y[0:len(site_B_data),0] = 1 # site b is first column
-y[len(site_B_data)+1:len(y),1] = 1 # site h is second column
-# site_B_class = np.ones((len(site_B_data),1)) 
-# site_H_class = np.ones((len(site_H_data),1))
+y[0:len(site_B_data), 0] = 1 # site b is first column
+y[len(site_B_data)+1:len(y), 1] = 1 # site h is second column
 
 # concatenate
 x = np.concatenate((site_B_connectomes, site_H_connectomes), axis=0)
@@ -165,7 +163,7 @@ E2Nnet_sml = BrainNetCNN(net_name, # Unique model name.
                          dir_data='./generated_synthetic_data', # Where to write the data to.
                         )
 #set pars
-E2Nnet_sml.pars['max_iter'] = 10000 # Train the model for 1000 iterations. (note this should be run for much longer!)
+E2Nnet_sml.pars['max_iter'] = 100000 # Train the model for 1000 iterations. (note this should be run for much longer!)
 E2Nnet_sml.pars['test_interval'] = 50 # Check the valid data every 50 iterations.
 E2Nnet_sml.pars['snapshot'] = 10 # Save the model weights every 1000 iterations.
 
@@ -186,7 +184,8 @@ print("mission completed!")
 # %%
 # Plot the training iterations vs. the training loss, the valid data mean-absolute-difference, 
 # and the valid data correlation with predicted and true (y_vald) labels.
-E2Nnet_sml.plot_iter_metrics() 
+file_name = "iter_metrics.png"
+E2Nnet_sml.plot_iter_metrics(True, file_name)
 
 # %%
 # Predict labels of test data
@@ -195,13 +194,16 @@ preds = E2Nnet_sml.predict(x_test)
 
 # %%
 # Compute the metrics.
-E2Nnet_sml.print_results(preds, y_test)
+E2Nnet_sml.print_results(preds, y_val)
 print("predictions raw", preds)
-print("y_test", y_test)
+print("y_test", y_val)
 preds_trans = np.zeros((preds.shape))
 preds_trans[preds >=0.5] = 1
 preds_trans[preds < 0.5] = 0
 print("predictions", preds_trans)
+
+accuracy = np.sum(np.sum(y_val != preds_trans))
+print("accuracy", accuracy)
 
 
 # %%
