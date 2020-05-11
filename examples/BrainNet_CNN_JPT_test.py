@@ -81,6 +81,8 @@ train_thresh = 0.7
 val_thresh = 0.2
 test_thresh = 0.1
 
+x_train, y_train, x_val, y_val, x_test, y_test = help.split_data(x, y, train_thresh, val_thresh)
+
 for idx, example in enumerate(x):
     
     # generate random number
@@ -190,7 +192,7 @@ E2Nnet_sml.plot_iter_metrics(True, file_name)
 
 # %%
 # Predict labels of test data
-preds = E2Nnet_sml.predict(x_test)
+preds = E2Nnet_sml.predict(x_val)
 
 
 # %%
@@ -209,10 +211,10 @@ print("accuracy", accuracy)
 
 # %%
 # We can save the model like this.
-test_data = (x_test, y_test)
-file_name = "models/test_data.pkl"
-with open(file_name, 'wb') as pkl_file:
-        pickle.dump(test_data, pkl_file, protocol = 2)
-E2Nnet_sml.save('models/E2Nnet_sml.pkl')
+# test_data = (x_test, y_test)
+# file_name = "models/test_data.pkl"
+# with open(file_name, 'wb') as pkl_file:
+#         pickle.dump(test_data, pkl_file, protocol = 2)
+# E2Nnet_sml.save('models/E2Nnet_sml.pkl')
 
 

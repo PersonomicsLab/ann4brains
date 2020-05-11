@@ -76,7 +76,7 @@ def connectomes_to_data(site_B_data, site_H_data, num_regions):
     return (x,y)
 
 #%% create e2n net
-def e2n(net_name, h, w, n_injuries):
+def e2n(net_name, h, w, n_injuries, max_iter = 10000, test_interval = 50, snapshot = 1000):
     # Specify the architecture using a list of dictionaries.
     e2n_arch = [
         ['e2n', # e2n layer 
@@ -98,14 +98,14 @@ def e2n(net_name, h, w, n_injuries):
                             dir_data='./generated_synthetic_data', # Where to write the data to.
                             )
     #set pars
-    E2Nnet_sml.pars['max_iter'] = 100000 # Train the model for 1000 iterations. (note this should be run for much longer!)
-    E2Nnet_sml.pars['test_interval'] = 50 # Check the valid data every 50 iterations.
-    E2Nnet_sml.pars['snapshot'] = 10 # Save the model weights every 1000 iterations.
+    E2Nnet_sml.pars['max_iter'] = max_iter # Train the model for 1000 iterations. (note this should be run for much longer!)
+    E2Nnet_sml.pars['test_interval'] = test_interval # Check the valid data every 50 iterations.
+    E2Nnet_sml.pars['snapshot'] = snapshot # Save the model weights every 1000 iterations.
 
     return E2Nnet_sml
 
 #%% create e2e + e2n net
-def e2e(net_name, h, w, n_injuries):
+def e2e(net_name, h, w, n_injuries, max_iter = 100, test_interval = 20, snapshot = 100):
     # Specify the architecture.
     e2e_arch = [
         ['e2e', # e2e layer 
@@ -140,3 +140,54 @@ def e2e(net_name, h, w, n_injuries):
     E2Enet_sml.pars['snapshot'] = 100 # Save the model weights every 100 iterations.
 
     return E2Enet_sml
+
+
+#%% randomly assign data to train, val, and test
+
+def split_data(x, y, train_thresh, val_thresh):
+    train_x = []
+    train_y = []
+    val_x = []
+    val_y = []
+    test_x = []
+    test_y = []
+
+    # seed random number generator
+    seed_num = 0
+    np.random.seed(seed_num)
+  
+
+    for idx, example in enumerate(x):
+        
+        # generate random number
+        split_prob = np.random.random()
+        # print(split_prob)
+
+        # train
+        if split_prob >= 0 and split_prob < train_thresh:
+            train_x.append(x[idx])
+            train_y.append(y[idx])
+        # val
+        elif split_prob >= train_thresh and split_prob < train_thresh + val_thresh:
+            val_x.append(x[idx])
+            val_y.append(y[idx])
+        # test
+        else:
+            test_x.append(x[idx])
+            test_y.append(y[idx])
+
+    x_train = np.array(train_x, dtype=np.float32)
+    y_train = np.array(train_y, dtype=np.float32)
+    x_val = np.array(val_x, dtype=np.float32)
+    y_val = np.array(val_y, dtype=np.float32)
+    x_test = np.array(test_x, dtype=np.float32)
+    y_test = np.array(test_y, dtype=np.float32)
+
+    print(x_train.shape)
+    print(y_train.shape)
+    print(x_val.shape)
+    print(y_val.shape)
+    print(x_test.shape)
+    print(y_test.shape)
+
+    return x_train, y_train, x_val, y_val, x_test, y_test

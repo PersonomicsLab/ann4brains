@@ -11,6 +11,7 @@ import numpy as np
 import pickle
 import caffe
 from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import train_test_split
 
 
 # To import ann4brains if not installed.
@@ -19,10 +20,7 @@ from ann4brains.synthetic.injury import ConnectomeInjury
 from ann4brains.nets import BrainNetCNN, load_model
 
 
-# In[28]:
-
-
-#get FNET data
+# import helpers directory and update
 import helpers_cluster as help
 import importlib
 
@@ -42,10 +40,23 @@ site_H_data = help.read_data(siteH_file)
 # create training data
 x,y = help.connectomes_to_data(site_B_data, site_H_data, num_regions)
 
+#%% split data 
+# create train, val, and test thresholds
+train_thresh = 0.7
+val_thresh = 0.2
+test_thresh = 0.1
+
+x_train, y_train, x_val, y_val, x_test, y_test = help.split_data(x, y, train_thresh, val_thresh)
+
+#%% combine training and validaiton data for k-fold cross validation
+x_train_val = np.concatenate((x_train, x_val), axis=0)
+y_train_val = np.concatenate((y_train, y_val), axis=0)
+
 #%% set up for splitting into k train and val
 seed = 7
+num_splits = 10
 # np.random.seed(seed)
-kfold = StratifiedKFold(n_splits=10, shuffle=True, random_state=seed)
+kfold = StratifiedKFold(n_splits=num_splits, shuffle=True, random_state=seed)
 x_hold = np.zeros(x.shape[0])
 y_hold = np.zeros(y.shape[0])
 all_training_indices = np.array(range(x.shape[0]))
@@ -55,7 +66,56 @@ h = x.shape[2]
 w = x.shape[3]
 os.environ["HDF5_USE_FILE_LOCKING"] = 'FALSE'
 
+net_name = 'E2Nnet_sml'
+net = help.e2n(net_name, h, w, n_injuries)
 
+accuracies = np.zeros((num_splits))
+actual = []
+og_preds = []
+predicted = []
+counter = 0
 for train, val in kfold.split(x_hold, y_hold):
     
+    # get data
+    x_trian = x_train_val[train]
+    y_train = y_train_val[train]
+    x_val = x_train_val[val]
+    y_val = y_train_val[val]
 
+    # train model
+    net.fit(x_train, y_train, x_val, y_val)  # If no valid data, could put test data here.
+    print("mission completed!")
+
+    # plot and save error over iterations
+    file_name = os.getcwd() + "/models/plot_metrics_{}.png".format(counter)
+    net.plot_iter_metrics(True, file_name)
+
+    # predict
+    preds = net.predict(x_val)
+
+    # Compute the accuracy
+    net.print_results(preds, y_val)
+    # print("predictions raw", preds)
+    # print("y_val", y_val)
+    preds_trans = np.zeros((preds.shape))
+    preds_trans[preds >=0.5] = 1
+    preds_trans[preds < 0.5] = 0
+    accuracy = np.sum(np.sum(y_val != preds_trans))
+    print("accuracy", accuracy)
+
+    # save accuracy, actual, and predicted
+    accuracies[counter] = accuracy
+    actual.append(y_val)
+    og_preds.append(preds)
+    predicted.append(preds_trans)
+
+    # save the model
+    net.save('models/E2Nnet_sml_{}.pkl'.format(counter))
+    counter = counter + 1
+
+
+#%% save data after training
+data = (accuracies, actual, og_preds, predicted)
+file_name = os.getcwd() + '/models/cross_val_iter_data.pkl'
+with open(file_name, 'wb') as pkl_file:
+        pickle.dump(data, pkl_file, protocol = 2)
