@@ -252,7 +252,7 @@ class BaseNet(object):
         pass
 
     # @abc.abstractmethod
-    def plot_iter_metrics(self):
+    def plot_iter_metrics(self, save = False, file_name = "")):
         """Plot the train, test metrics over iterations."""
         # Implement in the inherited class.
         pass
