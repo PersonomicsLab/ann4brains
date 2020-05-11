@@ -163,7 +163,7 @@ E2Nnet_sml = BrainNetCNN(net_name, # Unique model name.
                          dir_data='./generated_synthetic_data', # Where to write the data to.
                         )
 #set pars
-E2Nnet_sml.pars['max_iter'] = 100000 # Train the model for 1000 iterations. (note this should be run for much longer!)
+E2Nnet_sml.pars['max_iter'] = 10000 # Train the model for 1000 iterations. (note this should be run for much longer!)
 E2Nnet_sml.pars['test_interval'] = 50 # Check the valid data every 50 iterations.
 E2Nnet_sml.pars['snapshot'] = 10 # Save the model weights every 1000 iterations.
 
@@ -184,7 +184,7 @@ print("mission completed!")
 # %%
 # Plot the training iterations vs. the training loss, the valid data mean-absolute-difference, 
 # and the valid data correlation with predicted and true (y_vald) labels.
-file_name = "iter_metrics.png"
+file_name = "/examples/models/iter_metrics.png"
 E2Nnet_sml.plot_iter_metrics(True, file_name)
 
 # %%

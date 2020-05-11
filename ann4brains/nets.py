@@ -1,6 +1,6 @@
 from __future__ import print_function
 import numpy as np
-import os
+import sys, os
 import matplotlib.pyplot as plt
 import pickle as cPickle
 import caffe
@@ -413,6 +413,6 @@ class BrainNetCNN(BaseNet):
         axes[1].legend(lines + lines2, labels + labels2, loc='best')
 
         if save:
-            dir = "../ann4brains/examples/models"
-            file_name = os.path.join(dir, file_name)
+            parent = os.path.dirname(os.getcwd())
+            file_name = os.path.join(parent, file_name)
             plt.savefig(file_name)
