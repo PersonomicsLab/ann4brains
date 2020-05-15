@@ -10,8 +10,9 @@ import sys
 import numpy as np
 import pickle
 import caffe
-from sklearn.model_selection import StratifiedKFold
-from sklearn.model_selection import train_test_split
+import random
+# from sklearn.model_selection import StratifiedKFold
+# from sklearn.model_selection import train_test_split
 
 
 # To import ann4brains if not installed.
@@ -55,11 +56,27 @@ y_train_val = np.concatenate((y_train, y_val), axis=0)
 #%% set up for splitting into k train and val
 seed = 7
 num_splits = 10
-# np.random.seed(seed)
-kfold = StratifiedKFold(n_splits=num_splits, shuffle=True, random_state=seed)
-x_hold = np.zeros(x.shape[0])
-y_hold = np.zeros(y.shape[0])
-all_training_indices = np.array(range(x.shape[0]))
+
+# randomly order indices of train_val data bank
+random_order_idxs = list(range(x_train_val.shape[0]))
+random.shuffle(random_order_idxs)
+
+# split all data into pieces
+splits = [] # create empty list to hold slices in
+totalToDistr = x_train_val.shape[0]
+minForEachSlice = int(totalToDistr/float(num_splits))
+distrAtTop = totalToDistr % num_splits
+distrAtTopCounter = 0
+distMin = 0
+for split in range(num_splits):
+    distMax = distMin + minForEachSlice
+    if distrAtTopCounter < distrAtTop:
+        distMax = distMax + 1
+        distrAtTopCounter = distrAtTopCounter + 1
+    splits.append(random_order_idxs[distMin:distMax])
+
+
+#%% train model
 
 n_injuries = 2
 h = x.shape[2]
@@ -73,14 +90,14 @@ accuracies = np.zeros((num_splits))
 actual = []
 og_preds = []
 predicted = []
-counter = 0
-for train, val in kfold.split(x_hold, y_hold):
+for counter, val_idxs in enumerate(splits):
     
     # get data
-    x_trian = x_train_val[train]
-    y_train = y_train_val[train]
-    x_val = x_train_val[val]
-    y_val = y_train_val[val]
+    train_idxs = random_order_idxs - val_idxs
+    x_trian = x_train_val[train_idxs]
+    y_train = y_train_val[train_idxs]
+    x_val = x_train_val[val_idxs]
+    y_val = y_train_val[val_idxs]
 
     # train model
     net.fit(x_train, y_train, x_val, y_val)  # If no valid data, could put test data here.
@@ -113,6 +130,10 @@ for train, val in kfold.split(x_hold, y_hold):
     net.save('models/E2Nnet_sml_{}.pkl'.format(counter))
     counter = counter + 1
 
+#%% look at accurary
+print("accuracies", accuracies)
+ave_accuracy = np.mean(accuracies)
+print("average accuracy:", ave_accuracy)
 
 #%% save data after training
 data = (accuracies, actual, og_preds, predicted)
