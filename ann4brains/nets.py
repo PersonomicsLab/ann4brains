@@ -14,6 +14,15 @@ from ann4brains.utils import h5_utils
 from ann4brains.utils.h5_utils import caffe_write_h5
 from ann4brains.utils.metrics import regression_metrics
 
+# def get_target(discrim_predic, label):
+
+# calculating loss for generator
+# def gan_loss(n.out, n.label):
+#     gan_loss = 
+#     idt_loss = np.mean(n.out-n.label)
+#     cycle_loss = np.mean(n.out-n.label)
+#     return loss
+
 
 def load_model(filepath):
     """Load the model.

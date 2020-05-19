@@ -83,8 +83,8 @@ h = x.shape[2]
 w = x.shape[3]
 os.environ["HDF5_USE_FILE_LOCKING"] = 'FALSE'
 
-net_name = 'E2Nnet_sml'
-net = help.e2n(net_name, h, w, n_injuries)
+net_name = 'E2Enet_sml'
+net = help.e2e(net_name, h, w, n_injuries)
 
 accuracies = np.zeros((num_splits))
 actual = []
@@ -104,7 +104,7 @@ for counter, val_idxs in enumerate(splits):
     print("mission completed!")
 
     # plot and save error over iterations
-    file_name = os.getcwd() + "/models/plot_metrics_{}.png".format(counter)
+    file_name = os.getcwd() + "/models/plot_metrics_{}_{}.png".format(net_name, counter)
     net.plot_iter_metrics(True, file_name)
 
     # predict
@@ -127,7 +127,7 @@ for counter, val_idxs in enumerate(splits):
     predicted.append(preds_trans)
 
     # save the model
-    net.save('models/E2Nnet_sml_{}.pkl'.format(counter))
+    net.save('models/{}_{}.pkl'.format(net_name, counter))
     counter = counter + 1
 
 #%% look at accurary
@@ -137,6 +137,6 @@ print("average accuracy:", ave_accuracy)
 
 #%% save data after training
 data = (accuracies, actual, og_preds, predicted)
-file_name = os.getcwd() + '/models/cross_val_iter_data.pkl'
+file_name = os.getcwd() + '/models/{}_cross_val_iter_data.pkl'.format(net_name)
 with open(file_name, 'wb') as pkl_file:
         pickle.dump(data, pkl_file, protocol = 2)
